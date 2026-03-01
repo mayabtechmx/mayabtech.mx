@@ -70,13 +70,6 @@
                 <color_texto>#00ff00</color_texto>
                 <activo>true</activo>
             </slide>
-            <slide>
-                <imagen>promo_local.jpg</imagen>
-                <texto>¡Envíos gratis a todo Campeche!</texto>
-                <enlace>#ofertas</enlace>
-                <color_texto>#ffffff</color_texto>
-                <activo>true</activo>
-            </slide>
         </slides>
     </carrusel>
 
