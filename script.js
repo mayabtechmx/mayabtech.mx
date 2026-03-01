@@ -38,8 +38,8 @@ async function loadConfiguracion() {
         const response = await fetch('config.xml');
         const xmlText = await response.text();
         const xmlDoc = parseXML(xmlText);
-        
-        // Cargar información del sitio
+
+        // ========== SITIO ==========
         const sitio = xmlDoc.getElementsByTagName('sitio')[0];
         if (sitio) {
             SITIO = {
@@ -47,21 +47,25 @@ async function loadConfiguracion() {
                 descripcion: getTagValue(sitio, 'descripcion') || 'Tecnología en Campeche y Yucatán',
                 telefono: getTagValue(sitio, 'telefono') || '+52 981 123 4567',
                 email: getTagValue(sitio, 'email') || 'ventas@mayabtech.mx',
-                direccion: {
-                    calle: getTagValue(sitio, 'calle') || 'C. 20 77, Centro',
-                    colonia: getTagValue(sitio, 'colonia') || 'Centro',
-                    ciudad: getTagValue(sitio, 'ciudad') || 'San Francisco de Campeche',
-                    cp: getTagValue(sitio, 'cp') || '24800',
-                    municipio: getTagValue(sitio, 'municipio') || 'Hecelchakán',
-                    estado: getTagValue(sitio, 'estado') || 'Camp.',
-                    mapa: getTagValue(sitio, 'mapa') || 'https://maps.app.goo.gl/VEB5XRypW2ZF6gFy9',
-                    iframe: getTagValue(sitio, 'iframe') || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'
-                },
+                direccion: {},
                 horario: [],
                 redes: {}
             };
-            
-            // Cargar horario
+
+            const direccion = sitio.getElementsByTagName('direccion')[0];
+            if (direccion) {
+                SITIO.direccion = {
+                    calle: getTagValue(direccion, 'calle') || 'C. 20 77, Centro',
+                    colonia: getTagValue(direccion, 'colonia') || 'Centro',
+                    ciudad: getTagValue(direccion, 'ciudad') || 'San Francisco de Campeche',
+                    cp: getTagValue(direccion, 'cp') || '24800',
+                    municipio: getTagValue(direccion, 'municipio') || 'Hecelchakán',
+                    estado: getTagValue(direccion, 'estado') || 'Camp.',
+                    mapa: getTagValue(direccion, 'mapa') || '#',
+                    iframe: getTagValue(direccion, 'iframe') || ''
+                };
+            }
+
             const horario = sitio.getElementsByTagName('horario')[0];
             if (horario) {
                 const dias = horario.getElementsByTagName('dia');
@@ -70,17 +74,23 @@ async function loadConfiguracion() {
                 }
             }
         }
-        
-        // Cargar configuración del carrusel
+
+        // ========== CARRUSEL ==========
         const carrusel = xmlDoc.getElementsByTagName('carrusel')[0];
         if (carrusel) {
             const config = carrusel.getElementsByTagName('config')[0] || carrusel;
-            const slides = [];
-            const slideNodes = carrusel.getElementsByTagName('slide');
-            
-            for (let slide of slideNodes) {
+            CARRUSEL = {
+                intervalo: parseInt(getTagValue(config, 'intervalo')) || 4000,
+                autoplay: getTagValue(config, 'autoplay') !== 'false',
+                mostrar_controles: getTagValue(config, 'mostrar_controles') !== 'false',
+                mostrar_dots: getTagValue(config, 'mostrar_dots') !== 'false',
+                slides: []
+            };
+
+            const slides = carrusel.getElementsByTagName('slide');
+            for (let slide of slides) {
                 if (getTagValue(slide, 'activo') !== 'false') {
-                    slides.push({
+                    CARRUSEL.slides.push({
                         imagen: getTagValue(slide, 'imagen') || 'https://via.placeholder.com/1200x300',
                         texto: getTagValue(slide, 'texto') || '',
                         enlace: getTagValue(slide, 'enlace') || '#',
@@ -88,17 +98,9 @@ async function loadConfiguracion() {
                     });
                 }
             }
-            
-            CARRUSEL = {
-                intervalo: parseInt(getTagValue(config, 'intervalo')) || 4000,
-                autoplay: getTagValue(config, 'autoplay') !== 'false',
-                mostrar_controles: getTagValue(config, 'mostrar_controles') !== 'false',
-                mostrar_dots: getTagValue(config, 'mostrar_dots') !== 'false',
-                slides: slides
-            };
         }
-        
-        // Cargar categorías
+
+        // ========== CATEGORÍAS ==========
         const categorias = xmlDoc.getElementsByTagName('categorias')[0];
         if (categorias) {
             const categoriaNodes = categorias.getElementsByTagName('categoria');
@@ -114,11 +116,10 @@ async function loadConfiguracion() {
                     destacado: getTagValue(cat, 'destacado') === 'true'
                 });
             }
-            // Ordenar por orden
             CATEGORIAS.sort((a, b) => a.orden - b.orden);
         }
-        
-        // Cargar productos
+
+        // ========== PRODUCTOS ==========
         const productos = xmlDoc.getElementsByTagName('productos')[0];
         if (productos) {
             const productoNodes = productos.getElementsByTagName('producto');
@@ -129,13 +130,13 @@ async function loadConfiguracion() {
                 for (let img of imgNodes) {
                     imagenes.push(img.textContent);
                 }
-                
+
                 const especificaciones = [];
                 const espNodes = prod.getElementsByTagName('especificacion');
                 for (let esp of espNodes) {
                     especificaciones.push(esp.textContent);
                 }
-                
+
                 PRODUCTOS.push({
                     id: prod.getAttribute('id') || `prod_${Math.random()}`,
                     nombre: getTagValue(prod, 'nombre') || 'Producto',
@@ -151,29 +152,31 @@ async function loadConfiguracion() {
                 });
             }
         }
-        
-        // Cargar configuración de página
+
+        // ========== PÁGINA ==========
         const pagina = xmlDoc.getElementsByTagName('pagina')[0];
-        PAGINA = {
-            productos_por_pagina: parseInt(getTagValue(pagina, 'productos_por_pagina')) || 12,
-            productos_destacados_por_categoria: parseInt(getTagValue(pagina, 'productos_destacados_por_categoria')) || 4,
-            moneda: getTagValue(pagina, 'moneda') || '$',
-            formato_precio: getTagValue(pagina, 'formato_precio') || 'CLP',
-            impuesto_incluido: getTagValue(pagina, 'impuesto_incluido') === 'true',
-            porcentaje_impuesto: parseInt(getTagValue(pagina, 'porcentaje_impuesto')) || 0
-        };
-        
-        // Cargar mensajes
+        if (pagina) {
+            PAGINA = {
+                productos_por_pagina: parseInt(getTagValue(pagina, 'productos_por_pagina')) || 12,
+                productos_destacados_por_categoria: parseInt(getTagValue(pagina, 'productos_destacados_por_categoria')) || 4,
+                moneda: getTagValue(pagina, 'moneda') || '$',
+                formato_precio: getTagValue(pagina, 'formato_precio') || 'CLP',
+                impuesto_incluido: getTagValue(pagina, 'impuesto_incluido') === 'true',
+                porcentaje_impuesto: parseInt(getTagValue(pagina, 'porcentaje_impuesto')) || 0
+            };
+        }
+
+        // ========== MENSAJES ==========
         const mensajes = xmlDoc.getElementsByTagName('mensajes')[0];
-        MENSAJES = {};
         if (mensajes) {
+            MENSAJES = {};
             const msgNodes = mensajes.getElementsByTagName('mensaje');
             for (let msg of msgNodes) {
                 const tipo = msg.getAttribute('tipo');
                 MENSAJES[tipo] = msg.textContent;
             }
         }
-        
+
         return true;
     } catch (error) {
         console.error('Error cargando configuración:', error);
@@ -191,10 +194,10 @@ class Carousel {
         this.dotsContainer = document.getElementById('carouselDots');
         this.currentIndex = 0;
         this.interval = null;
-        
+
         this.init();
     }
-    
+
     init() {
         if (!this.slidesContainer || !CARRUSEL.slides || !CARRUSEL.slides.length) return;
         this.buildSlides();
@@ -202,13 +205,13 @@ class Carousel {
         this.addEventListeners();
         if (CARRUSEL.autoplay) this.startAutoSlide();
     }
-    
+
     buildSlides() {
         this.slidesContainer.innerHTML = '';
         CARRUSEL.slides.forEach((config, index) => {
             const slideDiv = document.createElement('div');
             slideDiv.className = 'carousel-slide';
-            
+
             const img = document.createElement('img');
             img.src = getImageUrl(config.imagen);
             img.alt = `Promoción ${index+1}`;
@@ -216,11 +219,11 @@ class Carousel {
                 img.src = 'https://via.placeholder.com/1200x300?text=Imagen+no+disponible';
             };
             slideDiv.appendChild(img);
-            
+
             if (config.texto) {
                 const textDiv = document.createElement('div');
                 textDiv.className = 'slide-text';
-                
+
                 if (config.enlace && config.enlace !== '#') {
                     const link = document.createElement('a');
                     link.href = config.enlace;
@@ -237,14 +240,14 @@ class Carousel {
                     span.style.display = 'inline-block';
                     textDiv.appendChild(span);
                 }
-                
+
                 slideDiv.appendChild(textDiv);
             }
-            
+
             this.slidesContainer.appendChild(slideDiv);
         });
     }
-    
+
     createDots() {
         if (!this.dotsContainer || !CARRUSEL.mostrar_dots) return;
         this.dotsContainer.innerHTML = '';
@@ -256,20 +259,20 @@ class Carousel {
             this.dotsContainer.appendChild(dot);
         });
     }
-    
+
     update() {
         const slides = document.querySelectorAll('.carousel-slide');
         if (!slides.length) return;
         const width = slides[0].clientWidth;
         this.slidesContainer.style.transform = `translateX(-${this.currentIndex * width}px)`;
-        
+
         if (CARRUSEL.mostrar_dots) {
             document.querySelectorAll('.dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === this.currentIndex);
             });
         }
     }
-    
+
     next() {
         const slides = document.querySelectorAll('.carousel-slide');
         if (slides.length) {
@@ -277,7 +280,7 @@ class Carousel {
             this.update();
         }
     }
-    
+
     prev() {
         const slides = document.querySelectorAll('.carousel-slide');
         if (slides.length) {
@@ -285,21 +288,21 @@ class Carousel {
             this.update();
         }
     }
-    
+
     goToSlide(index) {
         this.currentIndex = index;
         this.update();
     }
-    
+
     startAutoSlide() {
         this.stopAutoSlide();
         this.interval = setInterval(() => this.next(), CARRUSEL.intervalo);
     }
-    
+
     stopAutoSlide() {
         clearInterval(this.interval);
     }
-    
+
     addEventListeners() {
         if (CARRUSEL.mostrar_controles) {
             document.getElementById('prevBtn')?.addEventListener('click', () => {
@@ -307,7 +310,7 @@ class Carousel {
                 this.stopAutoSlide();
                 if (CARRUSEL.autoplay) this.startAutoSlide();
             });
-            
+
             document.getElementById('nextBtn')?.addEventListener('click', () => {
                 this.next();
                 this.stopAutoSlide();
@@ -319,7 +322,7 @@ class Carousel {
             if (prevBtn) prevBtn.style.display = 'none';
             if (nextBtn) nextBtn.style.display = 'none';
         }
-        
+
         const carousel = document.getElementById('carousel');
         if (carousel) {
             carousel.addEventListener('mouseenter', () => this.stopAutoSlide());
@@ -327,7 +330,7 @@ class Carousel {
                 if (CARRUSEL.autoplay) this.startAutoSlide();
             });
         }
-        
+
         window.addEventListener('resize', () => this.update());
     }
 }
@@ -341,7 +344,7 @@ class ProductRenderer {
         this.currentFilter = 'all';
         this.searchTerm = '';
     }
-    
+
     filterProducts() {
         return PRODUCTOS.filter(prod => {
             if (this.currentFilter !== 'all' && prod.categoria !== this.currentFilter) {
@@ -355,18 +358,18 @@ class ProductRenderer {
             return true;
         });
     }
-    
+
     createProductCard(prod) {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.onclick = () => {
             window.location.href = `producto.html?id=${prod.id}`;
         };
-        
+
         const imgSrc = prod.imagenes && prod.imagenes[0] 
             ? getImageUrl(prod.imagenes[0])
             : 'https://via.placeholder.com/200x200?text=Producto';
-        
+
         card.innerHTML = `
             <img class="product-img" src="${imgSrc}" alt="${prod.nombre}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+imagen'">
             <h3 class="product-title">${prod.nombre}</h3>
@@ -380,13 +383,13 @@ class ProductRenderer {
         `;
         return card;
     }
-    
+
     render() {
         if (!this.container) return;
-        
+
         const filteredProducts = this.filterProducts();
         this.container.innerHTML = '';
-        
+
         if (this.searchTerm) {
             const searchInfo = document.createElement('div');
             searchInfo.className = 'search-info';
@@ -395,14 +398,14 @@ class ProductRenderer {
                 <button class="clear-search" id="clearSearch"><i class="fas fa-times"></i> Limpiar búsqueda</button>
             `;
             this.container.appendChild(searchInfo);
-            
+
             document.getElementById('clearSearch')?.addEventListener('click', () => {
                 document.getElementById('searchInput').value = '';
                 this.searchTerm = '';
                 this.render();
             });
         }
-        
+
         if (filteredProducts.length === 0) {
             const noResults = document.createElement('div');
             noResults.className = 'no-results';
@@ -414,17 +417,16 @@ class ProductRenderer {
             this.container.appendChild(noResults);
             return;
         }
-        
+
         if (this.currentFilter === 'all' && !this.searchTerm) {
-            // Mostrar TODAS las categorías que tengan productos
             CATEGORIAS.forEach(cat => {
                 const productosCat = filteredProducts.filter(p => p.categoria === cat.id);
                 if (productosCat.length === 0) return;
-                
+
                 const section = document.createElement('section');
                 section.className = 'category-section';
                 section.id = cat.id;
-                
+
                 const header = document.createElement('div');
                 header.className = 'category-header';
                 header.innerHTML = `
@@ -432,30 +434,27 @@ class ProductRenderer {
                     <a class="view-all-link" data-category="${cat.id}"><i class="fas fa-arrow-right"></i> Mostrar todos</a>
                 `;
                 section.appendChild(header);
-                
+
                 const grid = document.createElement('div');
                 grid.className = 'product-grid';
-                
+
                 const maxProductos = PAGINA.productos_destacados_por_categoria || 4;
                 productosCat.slice(0, maxProductos).forEach(prod => {
                     grid.appendChild(this.createProductCard(prod));
                 });
-                
+
                 section.appendChild(grid);
                 this.container.appendChild(section);
             });
         } else {
-            // Vista de resultados
             const grid = document.createElement('div');
             grid.className = 'product-grid';
-            
             filteredProducts.forEach(prod => {
                 grid.appendChild(this.createProductCard(prod));
             });
-            
             this.container.appendChild(grid);
         }
-        
+
         document.querySelectorAll('.view-all-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -466,20 +465,20 @@ class ProductRenderer {
             });
         });
     }
-    
+
     setFilter(category) {
         this.currentFilter = category;
         this.searchTerm = '';
         const searchInput = document.getElementById('searchInput');
         if (searchInput) searchInput.value = '';
         this.render();
-        
+
         document.querySelectorAll('.category-nav a').forEach(link => {
             const linkCat = link.dataset.category;
             link.classList.toggle('active', linkCat === category);
         });
     }
-    
+
     setSearch(term) {
         this.searchTerm = term;
         this.currentFilter = 'all';
@@ -492,30 +491,28 @@ class ProductRenderer {
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando mayabtech.mx...');
-    
-    // Cargar configuración
+
     await loadConfiguracion();
-    console.log('Configuración cargada:', { CATEGORIAS: CATEGORIAS.length, PRODUCTOS: PRODUCTOS.length });
-    
-    // Actualizar título de la página
+    console.log('Configuración cargada:', { 
+        categorias: CATEGORIAS.length, 
+        productos: PRODUCTOS.length,
+        carrusel: CARRUSEL.slides?.length 
+    });
+
     document.title = (SITIO.nombre || 'mayabtech.mx') + ' · ' + (SITIO.descripcion || 'Tecnología en Campeche y Yucatán');
-    
-    // Actualizar logo
+
     const logo = document.getElementById('logo');
     if (logo) {
         logo.innerHTML = `<i class="fas fa-bolt"></i> ${SITIO.nombre || 'mayabtech.mx'}`;
     }
-    
-    // Inicializar carrusel
+
     if (CARRUSEL.slides && CARRUSEL.slides.length) {
         const carousel = new Carousel('carousel');
         setTimeout(() => carousel.update(), 100);
     }
-    
-    // Inicializar renderizador de productos
+
     const renderer = new ProductRenderer('mainContainer');
-    
-    // Configurar búsqueda
+
     document.getElementById('searchButton')?.addEventListener('click', () => {
         const input = document.getElementById('searchInput');
         if (!input) return;
@@ -527,14 +524,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
     });
-    
+
     document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             document.getElementById('searchButton')?.click();
         }
     });
-    
-    // Configurar navegación por categorías
+
     const categoryNav = document.getElementById('categoryNav');
     if (categoryNav) {
         categoryNav.innerHTML = '<a data-category="all" class="active"><i class="fas fa-home"></i> Todos</a>';
@@ -551,8 +547,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             categoryNav.appendChild(link);
         });
     }
-    
-    // Configurar información del sitio en footer
+
     const footerContent = document.querySelector('.footer-content');
     if (footerContent) {
         footerContent.innerHTML = `
@@ -567,14 +562,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p class="copyright">© 2025 ${SITIO.nombre || 'mayabtech.mx'} - ${SITIO.descripcion || 'Tecnología en Campeche y Yucatán'}</p>
         `;
     }
-    
-    // Configurar sección Visítanos
+
     const visitContainer = document.querySelector('.visit-container');
-    if (visitContainer) {
+    if (visitContainer && SITIO.direccion) {
         const horarioHTML = SITIO.horario && SITIO.horario.length 
             ? SITIO.horario.join('<br>') 
             : 'Lunes a Viernes: 9:00 AM - 7:00 PM<br>Sábados: 10:00 AM - 4:00 PM<br>Domingos: Cerrado';
-        
+
         visitContainer.innerHTML = `
             <div class="visit-info">
                 <h2><i class="fas fa-store"></i> ¡Visítanos!</h2>
@@ -582,10 +576,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 <div class="address">
                     <p><i class="fas fa-map-pin"></i> <span>Dirección:</span><br>
-                    ${SITIO.direccion?.calle || 'C. 20 77, Centro'}<br>
-                    ${SITIO.direccion?.colonia || 'Centro'}<br>
-                    ${SITIO.direccion?.ciudad || 'San Francisco de Campeche'}, ${SITIO.direccion?.cp || '24800'}<br>
-                    ${SITIO.direccion?.municipio || 'Hecelchakán'}, ${SITIO.direccion?.estado || 'Camp.'}</p>
+                    ${SITIO.direccion.calle || 'C. 20 77, Centro'}<br>
+                    ${SITIO.direccion.colonia || 'Centro'}<br>
+                    ${SITIO.direccion.ciudad || 'San Francisco de Campeche'}, ${SITIO.direccion.cp || '24800'}<br>
+                    ${SITIO.direccion.municipio || 'Hecelchakán'}, ${SITIO.direccion.estado || 'Camp.'}</p>
                     
                     <p><i class="fas fa-phone-alt"></i> <span>Teléfono:</span><br>
                     ${SITIO.telefono || '+52 981 123 4567'}</p>
@@ -599,14 +593,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ${horarioHTML}</p>
                 </div>
                 
-                <a href="${SITIO.direccion?.mapa || '#'}" target="_blank" class="map-button">
+                <a href="${SITIO.direccion.mapa || '#'}" target="_blank" class="map-button">
                     <i class="fas fa-directions"></i> Cómo llegar (Google Maps)
                 </a>
             </div>
             
             <div class="map-container">
                 <iframe 
-                    src="${SITIO.direccion?.iframe || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'}" 
+                    src="${SITIO.direccion.iframe || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'}" 
                     allowfullscreen="" 
                     loading="lazy" 
                     referrerpolicy="no-referrer-when-downgrade">
@@ -614,16 +608,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
     }
-    
-    // Smooth scroll para "Visítanos"
+
     document.querySelector('.visit-link')?.addEventListener('click', (e) => {
         e.preventDefault();
         const visitSection = document.getElementById('visitanos');
         if (visitSection) visitSection.scrollIntoView({ behavior: 'smooth' });
     });
-    
-    // Renderizar productos
+
     renderer.setFilter('all');
-    
     console.log('Inicialización completa');
 });
