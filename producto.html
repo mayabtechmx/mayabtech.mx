@@ -37,7 +37,21 @@
 
 <script>
     let CATEGORIAS = [];
-    let PAGINA = {};
+    let PAGINA = { moneda: '$' };
+
+    function getImageUrl(imageName) {
+        if (!imageName) return 'https://via.placeholder.com/500x500?text=Sin+imagen';
+        if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+            return imageName;
+        }
+        return 'imagenes/' + imageName;
+    }
+
+    function getTagValue(parent, tagName) {
+        if (!parent) return '';
+        const element = parent.getElementsByTagName(tagName)[0];
+        return element ? element.textContent : '';
+    }
 
     async function loadConfigAndProduct() {
         try {
@@ -124,27 +138,16 @@
         }
     }
     
-    function getTagValue(parent, tagName) {
-        const element = parent.getElementsByTagName(tagName)[0];
-        return element ? element.textContent : '';
-    }
-    
-    function getImageUrl(imageName) {
-        if (!imageName) return 'https://via.placeholder.com/500x500?text=Sin+imagen';
-        if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
-            return imageName;
-        }
-        return 'imagenes/' + imageName;
-    }
-    
     function renderProductDetail(product) {
         const imgSrc = product.imagenes && product.imagenes[0] 
             ? getImageUrl(product.imagenes[0])
             : 'https://via.placeholder.com/500x500?text=Sin+imagen';
         
-        const specsList = product.especificaciones.map(spec => 
-            `<li><i class="fas fa-check-circle" style="color: #28a745; margin-right: 10px;"></i>${spec}</li>`
-        ).join('');
+        const specsList = product.especificaciones && product.especificaciones.length
+            ? product.especificaciones.map(spec => 
+                `<li><i class="fas fa-check-circle" style="color: #28a745; margin-right: 10px;"></i>${spec}</li>`
+              ).join('')
+            : '<li>No hay especificaciones disponibles</li>';
         
         const html = `
             <div class="product-detail-container">

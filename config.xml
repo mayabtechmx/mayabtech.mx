@@ -35,12 +35,12 @@
          ============================================ -->
     <carrusel>
         <config>
-            <intervalo>4000</intervalo> <!-- milisegundos -->
+            <intervalo>4000</intervalo>
             <autoplay>true</autoplay>
             <mostrar_controles>true</mostrar_controles>
             <mostrar_dots>true</mostrar_dots>
         </config>
-        
+
         <slides>
             <slide>
                 <imagen>https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop</imagen>
@@ -71,7 +71,7 @@
                 <activo>true</activo>
             </slide>
             <slide>
-                <imagen>promo_local.jpg</imagen> <!-- imagen local -->
+                <imagen>promo_local.jpg</imagen>
                 <texto>¡Envíos gratis a todo Campeche!</texto>
                 <enlace>#ofertas</enlace>
                 <color_texto>#ffffff</color_texto>
@@ -81,7 +81,7 @@
     </carrusel>
 
     <!-- ============================================
-         CATEGORÍAS - Define las categorías del sitio
+         CATEGORÍAS
          ============================================ -->
     <categorias>
         <categoria id="cables">
@@ -116,17 +116,6 @@
             <orden>4</orden>
             <destacado>true</destacado>
         </categoria>
-        <!-- Puedes agregar más categorías aquí y aparecerán automáticamente -->
-        <!--
-        <categoria id="adaptadores">
-            <nombre>Adaptadores</nombre>
-            <icono>fa-exchange-alt</icono>
-            <descripcion>Adaptadores de corriente, video y red</descripcion>
-            <imagen>imagenes/adaptadores.jpg</imagen>
-            <orden>5</orden>
-            <destacado>false</destacado>
-        </categoria>
-        -->
     </categorias>
 
     <!-- ============================================
@@ -152,7 +141,7 @@
             <marca>Genérica</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="2">
             <nombre>Cable Lightning a USB (original)</nombre>
             <categoria>cables</categoria>
@@ -171,7 +160,7 @@
             <marca>Apple Certified</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="3">
             <nombre>Cable HDMI 2.0 1.5m</nombre>
             <categoria>cables</categoria>
@@ -190,7 +179,7 @@
             <marca>Premium</marca>
             <destacado>false</destacado>
         </producto>
-        
+
         <producto id="4">
             <nombre>Cable Ethernet CAT6 3m</nombre>
             <categoria>cables</categoria>
@@ -209,7 +198,7 @@
             <marca>Network Pro</marca>
             <destacado>false</destacado>
         </producto>
-        
+
         <!-- CARGADORES -->
         <producto id="5">
             <nombre>Cargador rápido 20W USB-C</nombre>
@@ -229,7 +218,7 @@
             <marca>FastCharge</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="6">
             <nombre>Cargador inalámbrico 15W</nombre>
             <categoria>cargadores</categoria>
@@ -248,7 +237,7 @@
             <marca>AirCharge</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="7">
             <nombre>Adaptador auto 36W (2 puertos)</nombre>
             <categoria>cargadores</categoria>
@@ -267,7 +256,7 @@
             <marca>RoadCharge</marca>
             <destacado>false</destacado>
         </producto>
-        
+
         <!-- AUDÍFONOS -->
         <producto id="8">
             <nombre>Audífonos Bluetooth TWS</nombre>
@@ -287,7 +276,7 @@
             <marca>SoundPro</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="9">
             <nombre>Audífonos diadema inalámbricos</nombre>
             <categoria>audifonos</categoria>
@@ -306,7 +295,7 @@
             <marca>AudioMax</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="10">
             <nombre>Audífonos deportivos Bluetooth</nombre>
             <categoria>audifonos</categoria>
@@ -325,7 +314,7 @@
             <marca>SportBeats</marca>
             <destacado>false</destacado>
         </producto>
-        
+
         <!-- BOCINAS -->
         <producto id="11">
             <nombre>Bocina portátil BT 10W</nombre>
@@ -345,7 +334,7 @@
             <marca>AquaSound</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="12">
             <nombre>Parlante fiesta 30W con luces</nombre>
             <categoria>bocinas</categoria>
@@ -364,7 +353,7 @@
             <marca>PartyMaster</marca>
             <destacado>true</destacado>
         </producto>
-        
+
         <producto id="13">
             <nombre>Mini bocina con cuerda</nombre>
             <categoria>bocinas</categoria>
@@ -392,7 +381,7 @@
         <productos_por_pagina>12</productos_por_pagina>
         <productos_destacados_por_categoria>4</productos_destacados_por_categoria>
         <moneda>$</moneda>
-        <formato_precio>CLP</formato_precio> <!-- CLP, USD, MXN, etc -->
+        <formato_precio>CLP</formato_precio>
         <impuesto_incluido>true</impuesto_incluido>
         <porcentaje_impuesto>19</porcentaje_impuesto>
     </pagina>

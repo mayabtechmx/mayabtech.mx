@@ -53,7 +53,21 @@
 <script>
     let CATEGORIAS = [];
     let PRODUCTOS = [];
-    let PAGINA = {};
+    let PAGINA = { moneda: '$' };
+
+    function getImageUrl(imageName) {
+        if (!imageName) return 'https://via.placeholder.com/300x300?text=Sin+imagen';
+        if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+            return imageName;
+        }
+        return 'imagenes/' + imageName;
+    }
+
+    function getTagValue(parent, tagName) {
+        if (!parent) return '';
+        const element = parent.getElementsByTagName(tagName)[0];
+        return element ? element.textContent : '';
+    }
 
     async function loadConfigAndCategory() {
         try {
@@ -113,19 +127,6 @@
         }
     }
     
-    function getTagValue(parent, tagName) {
-        const element = parent.getElementsByTagName(tagName)[0];
-        return element ? element.textContent : '';
-    }
-    
-    function getImageUrl(imageName) {
-        if (!imageName) return 'https://via.placeholder.com/300x300?text=Sin+imagen';
-        if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
-            return imageName;
-        }
-        return 'imagenes/' + imageName;
-    }
-    
     function renderCategory() {
         const urlParams = new URLSearchParams(window.location.search);
         const categoryId = urlParams.get('cat');
@@ -149,6 +150,11 @@
         // Renderizar productos
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
+        
+        if (productosCat.length === 0) {
+            grid.innerHTML = '<p style="text-align: center; padding: 40px;">No hay productos en esta categoría</p>';
+            return;
+        }
         
         productosCat.forEach(prod => {
             const card = document.createElement('div');

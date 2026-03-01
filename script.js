@@ -30,19 +30,6 @@ function getTagValue(parent, tagName) {
     return element ? element.textContent : '';
 }
 
-function getMultipleTagValues(parent, parentTag, childTag) {
-    const values = [];
-    if (!parent) return values;
-    const parentElem = parent.getElementsByTagName(parentTag)[0];
-    if (parentElem) {
-        const children = parentElem.getElementsByTagName(childTag);
-        for (let child of children) {
-            values.push(child.textContent);
-        }
-    }
-    return values;
-}
-
 // ============================================
 // CARGA DE CONFIGURACIÓN DESDE XML
 // ============================================
@@ -70,13 +57,18 @@ async function loadConfiguracion() {
                     mapa: getTagValue(sitio, 'mapa') || 'https://maps.app.goo.gl/VEB5XRypW2ZF6gFy9',
                     iframe: getTagValue(sitio, 'iframe') || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'
                 },
-                horario: ['Lunes a Viernes: 9:00 AM - 7:00 PM', 'Sábados: 10:00 AM - 4:00 PM', 'Domingos: Cerrado'],
-                redes: {
-                    facebook: getTagValue(sitio, 'facebook') || '#',
-                    instagram: getTagValue(sitio, 'instagram') || '#',
-                    whatsapp: getTagValue(sitio, 'whatsapp') || '#'
-                }
+                horario: [],
+                redes: {}
             };
+            
+            // Cargar horario
+            const horario = sitio.getElementsByTagName('horario')[0];
+            if (horario) {
+                const dias = horario.getElementsByTagName('dia');
+                for (let dia of dias) {
+                    SITIO.horario.push(dia.textContent);
+                }
+            }
         }
         
         // Cargar configuración del carrusel
@@ -97,32 +89,12 @@ async function loadConfiguracion() {
                 }
             }
             
-            // Si no hay slides en XML, usar defaults
-            if (slides.length === 0) {
-                slides.push(
-                    { imagen: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop', texto: '🎧 Audífonos con cancelación de ruido', enlace: '#', color_texto: '#ffffff' },
-                    { imagen: 'https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=1200&h=300&fit=crop', texto: '🔌 Cables USB-C 2x1', enlace: '#', color_texto: '#ffffff' }
-                );
-            }
-            
             CARRUSEL = {
                 intervalo: parseInt(getTagValue(config, 'intervalo')) || 4000,
                 autoplay: getTagValue(config, 'autoplay') !== 'false',
                 mostrar_controles: getTagValue(config, 'mostrar_controles') !== 'false',
                 mostrar_dots: getTagValue(config, 'mostrar_dots') !== 'false',
                 slides: slides
-            };
-        } else {
-            // Valores por defecto si no hay carrusel en XML
-            CARRUSEL = {
-                intervalo: 4000,
-                autoplay: true,
-                mostrar_controles: true,
-                mostrar_dots: true,
-                slides: [
-                    { imagen: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop', texto: '🎧 Audífonos con cancelación de ruido', enlace: '#', color_texto: '#ffffff' },
-                    { imagen: 'https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=1200&h=300&fit=crop', texto: '🔌 Cables USB-C 2x1', enlace: '#', color_texto: '#ffffff' }
-                ]
             };
         }
         
@@ -144,16 +116,6 @@ async function loadConfiguracion() {
             }
             // Ordenar por orden
             CATEGORIAS.sort((a, b) => a.orden - b.orden);
-        }
-        
-        // Si no hay categorías, crear algunas por defecto
-        if (CATEGORIAS.length === 0) {
-            CATEGORIAS = [
-                { id: 'cables', nombre: 'Cables', icono: 'fa-plug', descripcion: 'Todo tipo de cables', imagen: '', orden: 1, destacado: true },
-                { id: 'cargadores', nombre: 'Cargadores', icono: 'fa-battery-three-quarters', descripcion: 'Cargadores rápidos', imagen: '', orden: 2, destacado: true },
-                { id: 'audifonos', nombre: 'Audífonos', icono: 'fa-headphones', descripcion: 'Audífonos Bluetooth', imagen: '', orden: 3, destacado: true },
-                { id: 'bocinas', nombre: 'Bocinas', icono: 'fa-volume-up', descripcion: 'Bocinas portátiles', imagen: '', orden: 4, destacado: true }
-            ];
         }
         
         // Cargar productos
@@ -190,14 +152,6 @@ async function loadConfiguracion() {
             }
         }
         
-        // Si no hay productos, crear algunos por defecto
-        if (PRODUCTOS.length === 0) {
-            PRODUCTOS = [
-                { id: '1', nombre: 'Cable USB-C 1m', categoria: 'cables', precio: 8900, descripcion: 'Cable USB-C a USB', imagenes: ['https://images.pexels.com/photos/698057/pexels-photo-698057.jpeg?w=300&h=300&fit=crop'], especificaciones: ['Longitud: 1m', 'Carga rápida'], envio_gratis: true, stock: 10, marca: 'Genérica', destacado: true },
-                { id: '2', nombre: 'Cargador rápido 20W', categoria: 'cargadores', precio: 18500, descripcion: 'Cargador USB-C PD', imagenes: ['https://images.pexels.com/photos/909907/pexels-photo-909907.jpeg?w=300&h=300&fit=crop'], especificaciones: ['Potencia: 20W', 'Puerto USB-C'], envio_gratis: true, stock: 15, marca: 'FastCharge', destacado: true }
-            ];
-        }
-        
         // Cargar configuración de página
         const pagina = xmlDoc.getElementsByTagName('pagina')[0];
         PAGINA = {
@@ -223,29 +177,6 @@ async function loadConfiguracion() {
         return true;
     } catch (error) {
         console.error('Error cargando configuración:', error);
-        // Valores por defecto en caso de error
-        SITIO = { nombre: 'mayabtech.mx', descripcion: 'Tecnología en Campeche' };
-        CARRUSEL = {
-            intervalo: 4000,
-            autoplay: true,
-            mostrar_controles: true,
-            mostrar_dots: true,
-            slides: [
-                { imagen: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop', texto: '🎧 Audífonos', enlace: '#', color_texto: '#ffffff' },
-                { imagen: 'https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=1200&h=300&fit=crop', texto: '🔌 Cables', enlace: '#', color_texto: '#ffffff' }
-            ]
-        };
-        CATEGORIAS = [
-            { id: 'cables', nombre: 'Cables', icono: 'fa-plug', orden: 1, destacado: true },
-            { id: 'cargadores', nombre: 'Cargadores', icono: 'fa-battery-three-quarters', orden: 2, destacado: true },
-            { id: 'audifonos', nombre: 'Audífonos', icono: 'fa-headphones', orden: 3, destacado: true },
-            { id: 'bocinas', nombre: 'Bocinas', icono: 'fa-volume-up', orden: 4, destacado: true }
-        ];
-        PRODUCTOS = [
-            { id: '1', nombre: 'Cable USB-C', categoria: 'cables', precio: 8900, descripcion: 'Cable USB-C', imagenes: ['https://images.pexels.com/photos/698057/pexels-photo-698057.jpeg?w=300&h=300&fit=crop'], envio_gratis: true, stock: 10 },
-            { id: '2', nombre: 'Cargador 20W', categoria: 'cargadores', precio: 18500, descripcion: 'Cargador rápido', imagenes: ['https://images.pexels.com/photos/909907/pexels-photo-909907.jpeg?w=300&h=300&fit=crop'], envio_gratis: true, stock: 15 }
-        ];
-        PAGINA = { moneda: '$', productos_destacados_por_categoria: 4 };
         return false;
     }
 }
@@ -485,10 +416,8 @@ class ProductRenderer {
         }
         
         if (this.currentFilter === 'all' && !this.searchTerm) {
-            // Mostrar por categorías
-            const categoriasMostrar = CATEGORIAS.filter(cat => cat.destacado !== false);
-            
-            categoriasMostrar.forEach(cat => {
+            // Mostrar TODAS las categorías que tengan productos
+            CATEGORIAS.forEach(cat => {
                 const productosCat = filteredProducts.filter(p => p.categoria === cat.id);
                 if (productosCat.length === 0) return;
                 
@@ -566,7 +495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Cargar configuración
     await loadConfiguracion();
-    console.log('Configuración cargada:', { SITIO, CARRUSEL, CATEGORIAS, PRODUCTOS, PAGINA });
+    console.log('Configuración cargada:', { CATEGORIAS: CATEGORIAS.length, PRODUCTOS: PRODUCTOS.length });
     
     // Actualizar título de la página
     document.title = (SITIO.nombre || 'mayabtech.mx') + ' · ' + (SITIO.descripcion || 'Tecnología en Campeche y Yucatán');
@@ -578,8 +507,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Inicializar carrusel
-    const carousel = new Carousel('carousel');
-    setTimeout(() => carousel.update(), 100);
+    if (CARRUSEL.slides && CARRUSEL.slides.length) {
+        const carousel = new Carousel('carousel');
+        setTimeout(() => carousel.update(), 100);
+    }
     
     // Inicializar renderizador de productos
     const renderer = new ProductRenderer('mainContainer');
@@ -603,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
     
-    // Configurar navegación por categorías (dinámico desde XML)
+    // Configurar navegación por categorías
     const categoryNav = document.getElementById('categoryNav');
     if (categoryNav) {
         categoryNav.innerHTML = '<a data-category="all" class="active"><i class="fas fa-home"></i> Todos</a>';
@@ -639,7 +570,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Configurar sección Visítanos
     const visitContainer = document.querySelector('.visit-container');
-    if (visitContainer && SITIO.direccion) {
+    if (visitContainer) {
+        const horarioHTML = SITIO.horario && SITIO.horario.length 
+            ? SITIO.horario.join('<br>') 
+            : 'Lunes a Viernes: 9:00 AM - 7:00 PM<br>Sábados: 10:00 AM - 4:00 PM<br>Domingos: Cerrado';
+        
         visitContainer.innerHTML = `
             <div class="visit-info">
                 <h2><i class="fas fa-store"></i> ¡Visítanos!</h2>
@@ -647,10 +582,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 <div class="address">
                     <p><i class="fas fa-map-pin"></i> <span>Dirección:</span><br>
-                    ${SITIO.direccion.calle || 'C. 20 77, Centro'}<br>
-                    ${SITIO.direccion.colonia || 'Centro'}<br>
-                    ${SITIO.direccion.ciudad || 'San Francisco de Campeche'}, ${SITIO.direccion.cp || '24800'}<br>
-                    ${SITIO.direccion.municipio || 'Hecelchakán'}, ${SITIO.direccion.estado || 'Camp.'}</p>
+                    ${SITIO.direccion?.calle || 'C. 20 77, Centro'}<br>
+                    ${SITIO.direccion?.colonia || 'Centro'}<br>
+                    ${SITIO.direccion?.ciudad || 'San Francisco de Campeche'}, ${SITIO.direccion?.cp || '24800'}<br>
+                    ${SITIO.direccion?.municipio || 'Hecelchakán'}, ${SITIO.direccion?.estado || 'Camp.'}</p>
                     
                     <p><i class="fas fa-phone-alt"></i> <span>Teléfono:</span><br>
                     ${SITIO.telefono || '+52 981 123 4567'}</p>
@@ -661,17 +596,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 <div class="visit-hours">
                     <p><i class="fas fa-clock"></i> <span>Horario de atención:</span><br>
-                    ${(SITIO.horario && SITIO.horario.length) ? SITIO.horario.join('<br>') : 'Lunes a Viernes: 9:00 AM - 7:00 PM<br>Sábados: 10:00 AM - 4:00 PM<br>Domingos: Cerrado'}</p>
+                    ${horarioHTML}</p>
                 </div>
                 
-                <a href="${SITIO.direccion.mapa || '#'}" target="_blank" class="map-button">
+                <a href="${SITIO.direccion?.mapa || '#'}" target="_blank" class="map-button">
                     <i class="fas fa-directions"></i> Cómo llegar (Google Maps)
                 </a>
             </div>
             
             <div class="map-container">
                 <iframe 
-                    src="${SITIO.direccion.iframe || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'}" 
+                    src="${SITIO.direccion?.iframe || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'}" 
                     allowfullscreen="" 
                     loading="lazy" 
                     referrerpolicy="no-referrer-when-downgrade">
