@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de producto · mayabtech.mx</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top-header">
+    <div class="logo-area">
+        <a href="index.html" class="logo" id="logo"><i class="fas fa-bolt"></i> mayabtech.mx</a>
+        <a href="index.html#visitanos" class="visit-link"><i class="fas fa-map-marker-alt"></i> Visítanos</a>
+    </div>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar productos...">
+        <button id="searchButton"><i class="fas fa-search"></i></button>
+    </div>
+</header>
+
+<nav class="category-nav" id="categoryNav"></nav>
+
+<main class="container">
+    <a href="javascript:history.back()" class="back-link">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+    <div id="productDetail" class="product-detail">
+        <p>Cargando producto...</p>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content"></div>
+</footer>
+
+<script>
+    let CATEGORIAS = [];
+    let PAGINA = {};
+
+    async function loadConfigAndProduct() {
+        try {
+            const response = await fetch('config.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            
+            // Cargar categorías para el menú
+            const categorias = xmlDoc.getElementsByTagName('categorias')[0];
+            if (categorias) {
+                const categoriaNodes = categorias.getElementsByTagName('categoria');
+                CATEGORIAS = [];
+                for (let cat of categoriaNodes) {
+                    CATEGORIAS.push({
+                        id: cat.getAttribute('id'),
+                        nombre: getTagValue(cat, 'nombre'),
+                        icono: getTagValue(cat, 'icono')
+                    });
+                }
+            }
+            
+            // Cargar configuración de página
+            const pagina = xmlDoc.getElementsByTagName('pagina')[0];
+            PAGINA = {
+                moneda: getTagValue(pagina, 'moneda') || '$'
+            };
+            
+            // Construir menú
+            const categoryNav = document.getElementById('categoryNav');
+            categoryNav.innerHTML = '<a href="index.html"><i class="fas fa-home"></i> Inicio</a>';
+            CATEGORIAS.forEach(cat => {
+                const link = document.createElement('a');
+                link.href = `categoria.html?cat=${cat.id}`;
+                link.innerHTML = `<i class="fas ${cat.icono}"></i> ${cat.nombre}`;
+                categoryNav.appendChild(link);
+            });
+            
+            // Cargar producto específico
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            const productos = xmlDoc.getElementsByTagName('producto');
+            let product = null;
+            
+            for (let prod of productos) {
+                if (prod.getAttribute('id') === productId) {
+                    const imagenes = [];
+                    const imgNodes = prod.getElementsByTagName('imagen');
+                    for (let img of imgNodes) {
+                        imagenes.push(img.textContent);
+                    }
+                    
+                    const especificaciones = [];
+                    const espNodes = prod.getElementsByTagName('especificacion');
+                    for (let esp of espNodes) {
+                        especificaciones.push(esp.textContent);
+                    }
+                    
+                    product = {
+                        id: prod.getAttribute('id'),
+                        nombre: getTagValue(prod, 'nombre'),
+                        categoria: getTagValue(prod, 'categoria'),
+                        precio: parseInt(getTagValue(prod, 'precio')) || 0,
+                        descripcion: getTagValue(prod, 'descripcion'),
+                        imagenes: imagenes,
+                        especificaciones: especificaciones,
+                        envio_gratis: getTagValue(prod, 'envio_gratis') === 'true',
+                        stock: parseInt(getTagValue(prod, 'stock')) || 0,
+                        marca: getTagValue(prod, 'marca')
+                    };
+                    break;
+                }
+            }
+            
+            if (product) {
+                renderProductDetail(product);
+            } else {
+                document.getElementById('productDetail').innerHTML = '<p>Producto no encontrado</p>';
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    function getTagValue(parent, tagName) {
+        const element = parent.getElementsByTagName(tagName)[0];
+        return element ? element.textContent : '';
+    }
+    
+    function getImageUrl(imageName) {
+        if (!imageName) return 'https://via.placeholder.com/500x500?text=Sin+imagen';
+        if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+            return imageName;
+        }
+        return 'imagenes/' + imageName;
+    }
+    
+    function renderProductDetail(product) {
+        const imgSrc = product.imagenes && product.imagenes[0] 
+            ? getImageUrl(product.imagenes[0])
+            : 'https://via.placeholder.com/500x500?text=Sin+imagen';
+        
+        const specsList = product.especificaciones.map(spec => 
+            `<li><i class="fas fa-check-circle" style="color: #28a745; margin-right: 10px;"></i>${spec}</li>`
+        ).join('');
+        
+        const html = `
+            <div class="product-detail-container">
+                <div>
+                    <img class="product-detail-image" src="${imgSrc}" alt="${product.nombre}" onerror="this.src='https://via.placeholder.com/500x500?text=Sin+imagen'">
+                </div>
+                <div class="product-detail-info">
+                    <h1>${product.nombre}</h1>
+                    <div class="product-detail-price">${PAGINA.moneda}${product.precio.toLocaleString()}</div>
+                    
+                    <div class="product-detail-description">
+                        <p>${product.descripcion}</p>
+                    </div>
+                    
+                    <div class="product-specs">
+                        <h3><i class="fas fa-clipboard-list"></i> Especificaciones</h3>
+                        <ul>
+                            ${specsList}
+                        </ul>
+                    </div>
+                    
+                    <div class="product-detail-stock">
+                        <i class="fas fa-box"></i> Stock disponible: ${product.stock} unidades
+                    </div>
+                    
+                    ${product.envio_gratis ? 
+                        '<div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px;"><i class="fas fa-truck"></i> Envío gratis a todo Campeche y Yucatán</div>' : 
+                        ''
+                    }
+                    
+                    <button class="btn-add-cart" onclick="alert('Carrito en desarrollo - Próximamente disponible')">
+                        <i class="fas fa-shopping-cart"></i> Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('productDetail').innerHTML = html;
+    }
+    
+    // Búsqueda rápida
+    document.getElementById('searchButton')?.addEventListener('click', () => {
+        const term = document.getElementById('searchInput').value.trim();
+        if (term) {
+            window.location.href = `index.html?search=${encodeURIComponent(term)}`;
+        }
+    });
+    
+    document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('searchButton').click();
+        }
+    });
+    
+    loadConfigAndProduct();
+</script>
+</body>
+</html>
