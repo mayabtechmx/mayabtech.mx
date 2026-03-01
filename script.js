@@ -177,9 +177,14 @@ async function loadConfiguracion() {
             }
         }
 
+        console.log('✅ Configuración cargada:', { 
+            categorias: CATEGORIAS.length, 
+            productos: PRODUCTOS.length,
+            carrusel: CARRUSEL.slides?.length 
+        });
         return true;
     } catch (error) {
-        console.error('Error cargando configuración:', error);
+        console.error('❌ Error cargando configuración:', error);
         return false;
     }
 }
@@ -490,14 +495,9 @@ class ProductRenderer {
 // INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Inicializando mayabtech.mx...');
+    console.log('🚀 Inicializando mayabtech.mx...');
 
     await loadConfiguracion();
-    console.log('Configuración cargada:', { 
-        categorias: CATEGORIAS.length, 
-        productos: PRODUCTOS.length,
-        carrusel: CARRUSEL.slides?.length 
-    });
 
     document.title = (SITIO.nombre || 'mayabtech.mx') + ' · ' + (SITIO.descripcion || 'Tecnología en Campeche y Yucatán');
 
@@ -616,5 +616,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     renderer.setFilter('all');
-    console.log('Inicialización completa');
+    console.log('✅ Inicialización completa');
 });
