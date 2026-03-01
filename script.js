@@ -31,17 +31,35 @@ function getTagValue(parent, tagName) {
 }
 
 // ============================================
-// CARGA DE CONFIGURACIÓN DESDE XML
+// CARGA DE CONFIGURACIÓN DESDE XML (CON DEBUG)
 // ============================================
 async function loadConfiguracion() {
     try {
-        const response = await fetch('config.xml');
+        console.log('📡 Cargando configuracion.xml...');
+        // ¡NOMBRE NUEVO + TRUCO ANTI-CACHÉ!
+        const response = await fetch('configuracion.xml?nocache=' + Date.now());
         const xmlText = await response.text();
+        console.log('✅ XML cargado, longitud:', xmlText.length);
+        
         const xmlDoc = parseXML(xmlText);
+        console.log('📄 XML parseado');
+
+        // DEBUG: Ver qué etiquetas existen
+        const root = xmlDoc.documentElement;
+        console.log('🔍 Etiqueta raíz:', root.tagName);
+        
+        // Listar todas las etiquetas disponibles
+        const todasLasEtiquetas = xmlDoc.getElementsByTagName('*');
+        const etiquetasUnicas = new Set();
+        for (let etiqueta of todasLasEtiquetas) {
+            etiquetasUnicas.add(etiqueta.tagName);
+        }
+        console.log('📋 Etiquetas encontradas:', Array.from(etiquetasUnicas));
 
         // ========== SITIO ==========
         const sitio = xmlDoc.getElementsByTagName('sitio')[0];
         if (sitio) {
+            console.log('🏠 Sección SITIO encontrada');
             SITIO = {
                 nombre: getTagValue(sitio, 'nombre') || 'mayabtech.mx',
                 descripcion: getTagValue(sitio, 'descripcion') || 'Tecnología en Campeche y Yucatán',
@@ -73,11 +91,14 @@ async function loadConfiguracion() {
                     SITIO.horario.push(dia.textContent);
                 }
             }
+        } else {
+            console.warn('⚠️ No se encontró sección SITIO');
         }
 
         // ========== CARRUSEL ==========
         const carrusel = xmlDoc.getElementsByTagName('carrusel')[0];
         if (carrusel) {
+            console.log('🎠 Sección CARRUSEL encontrada');
             const config = carrusel.getElementsByTagName('config')[0] || carrusel;
             CARRUSEL = {
                 intervalo: parseInt(getTagValue(config, 'intervalo')) || 4000,
@@ -88,6 +109,8 @@ async function loadConfiguracion() {
             };
 
             const slides = carrusel.getElementsByTagName('slide');
+            console.log(`📸 Encontrados ${slides.length} slides`);
+            
             for (let slide of slides) {
                 if (getTagValue(slide, 'activo') !== 'false') {
                     CARRUSEL.slides.push({
@@ -98,17 +121,26 @@ async function loadConfiguracion() {
                     });
                 }
             }
+        } else {
+            console.warn('⚠️ No se encontró sección CARRUSEL');
         }
 
         // ========== CATEGORÍAS ==========
         const categorias = xmlDoc.getElementsByTagName('categorias')[0];
         if (categorias) {
+            console.log('📁 Sección CATEGORIAS encontrada');
             const categoriaNodes = categorias.getElementsByTagName('categoria');
+            console.log(`📌 Encontradas ${categoriaNodes.length} categorías`);
+            
             CATEGORIAS = [];
             for (let cat of categoriaNodes) {
+                const id = cat.getAttribute('id');
+                const nombre = getTagValue(cat, 'nombre');
+                console.log(`   - ID: ${id}, Nombre: ${nombre}`);
+                
                 CATEGORIAS.push({
-                    id: cat.getAttribute('id') || `cat_${Math.random()}`,
-                    nombre: getTagValue(cat, 'nombre') || 'Categoría',
+                    id: id || `cat_${Math.random()}`,
+                    nombre: nombre || 'Categoría',
                     icono: getTagValue(cat, 'icono') || 'fa-tag',
                     descripcion: getTagValue(cat, 'descripcion') || '',
                     imagen: getTagValue(cat, 'imagen') || '',
@@ -117,14 +149,24 @@ async function loadConfiguracion() {
                 });
             }
             CATEGORIAS.sort((a, b) => a.orden - b.orden);
+        } else {
+            console.warn('⚠️ No se encontró sección CATEGORIAS');
         }
 
         // ========== PRODUCTOS ==========
         const productos = xmlDoc.getElementsByTagName('productos')[0];
         if (productos) {
+            console.log('📦 Sección PRODUCTOS encontrada');
             const productoNodes = productos.getElementsByTagName('producto');
+            console.log(`🎁 Encontrados ${productoNodes.length} productos`);
+            
             PRODUCTOS = [];
             for (let prod of productoNodes) {
+                const id = prod.getAttribute('id');
+                const nombre = getTagValue(prod, 'nombre');
+                const categoria = getTagValue(prod, 'categoria');
+                console.log(`   - ID: ${id}, Nombre: ${nombre}, Categoría: ${categoria}`);
+                
                 const imagenes = [];
                 const imgNodes = prod.getElementsByTagName('imagen');
                 for (let img of imgNodes) {
@@ -138,9 +180,9 @@ async function loadConfiguracion() {
                 }
 
                 PRODUCTOS.push({
-                    id: prod.getAttribute('id') || `prod_${Math.random()}`,
-                    nombre: getTagValue(prod, 'nombre') || 'Producto',
-                    categoria: getTagValue(prod, 'categoria') || 'general',
+                    id: id || `prod_${Math.random()}`,
+                    nombre: nombre || 'Producto',
+                    categoria: categoria || 'general',
                     precio: parseInt(getTagValue(prod, 'precio')) || 9900,
                     descripcion: getTagValue(prod, 'descripcion') || 'Descripción del producto',
                     imagenes: imagenes.length ? imagenes : ['https://via.placeholder.com/300x300'],
@@ -151,37 +193,16 @@ async function loadConfiguracion() {
                     destacado: getTagValue(prod, 'destacado') === 'true'
                 });
             }
+        } else {
+            console.warn('⚠️ No se encontró sección PRODUCTOS');
         }
 
-        // ========== PÁGINA ==========
-        const pagina = xmlDoc.getElementsByTagName('pagina')[0];
-        if (pagina) {
-            PAGINA = {
-                productos_por_pagina: parseInt(getTagValue(pagina, 'productos_por_pagina')) || 12,
-                productos_destacados_por_categoria: parseInt(getTagValue(pagina, 'productos_destacados_por_categoria')) || 4,
-                moneda: getTagValue(pagina, 'moneda') || '$',
-                formato_precio: getTagValue(pagina, 'formato_precio') || 'CLP',
-                impuesto_incluido: getTagValue(pagina, 'impuesto_incluido') === 'true',
-                porcentaje_impuesto: parseInt(getTagValue(pagina, 'porcentaje_impuesto')) || 0
-            };
-        }
-
-        // ========== MENSAJES ==========
-        const mensajes = xmlDoc.getElementsByTagName('mensajes')[0];
-        if (mensajes) {
-            MENSAJES = {};
-            const msgNodes = mensajes.getElementsByTagName('mensaje');
-            for (let msg of msgNodes) {
-                const tipo = msg.getAttribute('tipo');
-                MENSAJES[tipo] = msg.textContent;
-            }
-        }
-
-        console.log('✅ Configuración cargada:', { 
+        console.log('📊 RESUMEN:', { 
             categorias: CATEGORIAS.length, 
             productos: PRODUCTOS.length,
             carrusel: CARRUSEL.slides?.length 
         });
+        
         return true;
     } catch (error) {
         console.error('❌ Error cargando configuración:', error);
@@ -615,6 +636,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (visitSection) visitSection.scrollIntoView({ behavior: 'smooth' });
     });
 
-    renderer.setFilter('all');
-    console.log('✅ Inicialización completa');
+    setTimeout(() => {
+        renderer.setFilter('all');
+        console.log('✅ Inicialización completa (con retraso)');
+    }, 500);
 });

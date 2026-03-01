@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuracion>
+    <!-- ============================================
+         CONFIGURACIÓN DEL SITIO
+         ============================================ -->
+    <sitio>
+        <nombre>mayabtech.mx</nombre>
+        <descripcion>Tecnología en Campeche y Yucatán</descripcion>
+        <telefono>+52 981 123 4567</telefono>
+        <email>ventas@mayabtech.mx</email>
+        <direccion>
+            <calle>C. 20 77, Centro</calle>
+            <colonia>Centro</colonia>
+            <ciudad>San Francisco de Campeche</ciudad>
+            <cp>24800</cp>
+            <municipio>Hecelchakán</municipio>
+            <estado>Camp.</estado>
+            <iframe>https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d939.123456789!2d-90.134326!3d20.177304!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDEwJzM4LjMiTiA5MMKwMDgnMDMuNiJX!5e0!3m2!1ses!2smx!4v1709765432100</iframe>
+        </direccion>
+        <horario>
+            <dia>Lunes a Viernes: 9:00 AM - 7:00 PM</dia>
+            <dia>Sábados: 10:00 AM - 4:00 PM</dia>
+            <dia>Domingos: Cerrado</dia>
+        </horario>
+        <redes>
+            <facebook>https://facebook.com/mayabtech</facebook>
+            <instagram>https://instagram.com/mayabtech</instagram>
+            <whatsapp>5219811234567</whatsapp>
+        </redes>
+    </sitio>
+
+    <!-- ============================================
+         CARRUSEL - IMÁGENES CORREGIDAS
+         ============================================ -->
+    <carrusel>
+        <config>
+            <intervalo>4000</intervalo>
+            <autoplay>true</autoplay>
+            <mostrar_controles>true</mostrar_controles>
+            <mostrar_dots>true</mostrar_dots>
+        </config>
+
+        <slides>
+            <slide>
+                <imagen>https://m.media-amazon.com/images/I/61EL2AKKcBL._AC_SL1500_.jpg</imagen>
+                <texto>🎧 Audífonos con cancelación de ruido - 30% OFF</texto>
+                <enlace>categoria.html?cat=audifonos</enlace>
+                <color_texto>#ffffff</color_texto>
+                <activo>true</activo>
+            </slide>
+            <slide>
+                <imagen>https://m.media-amazon.com/images/I/71U9WVoGotL._SL1500_.jpg</imagen>
+                <texto>🔌 Cables USB-C 2x1 ¡Compra ahora!</texto>
+                <enlace>categoria.html?cat=cables</enlace>
+                <color_texto>#ffd700</color_texto>
+                <activo>true</activo>
+            </slide>
+            <slide>
+                <imagen>https://m.media-amazon.com/images/I/51RMJiUqP7L._AC_SL1500_.jpg</imagen>
+                <texto>⚡ Cargadores rápidos 20W - Envío gratis</texto>
+                <enlace>categoria.html?cat=cargadores</enlace>
+                <color_texto>#ffffff</color_texto>
+                <activo>true</activo>
+            </slide>
+            <slide>
+                <imagen>https://m.media-amazon.com/images/I/81CfcmphL+L._AC_SL1500_.jpg</imagen>
+                <texto>🎵 Bocinas portátiles resistentes al agua</texto>
+                <enlace>categoria.html?cat=bocinas</enlace>
+                <color_texto>#00ff00</color_texto>
+                <activo>true</activo>
+            </slide>
+        </slides>
+    </carrusel>
+
+    <!-- ============================================
+         CATEGORÍAS
+         ============================================ -->
+    <categorias>
+        <categoria id="cables">
+            <nombre>Cables</nombre>
+            <icono>fa-plug</icono>
+            <descripcion>Todo tipo de cables: USB, HDMI, Ethernet, adaptadores</descripcion>
+            <imagen>https://m.media-amazon.com/images/I/51zTEhwQKQL._SL1000_.jpg</imagen>
+            <orden>1</orden>
+            <destacado>true</destacado>
+        </categoria>
+        <categoria id="cargadores">
+            <nombre>Cargadores</nombre>
+            <icono>fa-battery-three-quarters</icono>
+            <descripcion>Cargadores rápidos, inalámbricos y para auto</descripcion>
+            <imagen>https://m.media-amazon.com/images/I/41cyDnFba7L._AC_SL1500_.jpg</imagen>
+            <orden>2</orden>
+            <destacado>true</destacado>
+        </categoria>
+        <categoria id="audifonos">
+            <nombre>Audífonos</nombre>
+            <icono>fa-headphones</icono>
+            <descripcion>Audífonos TWS, diadema, deportivos y más</descripcion>
+            <imagen>https://m.media-amazon.com/images/I/516gXzENw1L._AC_SL1500_.jpg</imagen>
+            <orden>3</orden>
+            <destacado>true</destacado>
+        </categoria>
+        <categoria id="bocinas">
+            <nombre>Bocinas portátiles</nombre>
+            <icono>fa-volume-up</icono>
+            <descripcion>Bocinas Bluetooth, fiesta, mini y resistentes al agua</descripcion>
+            <imagen>https://m.media-amazon.com/images/I/71Zlj-CiTwL._AC_SL1200_.jpg</imagen>
+            <orden>4</orden>
+            <destacado>true</destacado>
+        </categoria>
+    </categorias>
+
+    <!-- ============================================
+         PRODUCTOS - CON IMÁGENES DE AMAZON
+         ============================================ -->
+    <productos>
+        <!-- CABLES -->
+        <producto id="1">
+            <nombre>Cable USB-C a USB 3.0 1m</nombre>
+            <categoria>cables</categoria>
+            <precio>8900</precio>
+            <descripcion>Cable rápido y resistente, compatible con carga rápida. Velocidad de transferencia hasta 5Gbps.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/51zTEhwQKQL._SL1000_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Longitud: 1 metro</especificacion>
+                <especificacion>Conectores: USB-C a USB-A</especificacion>
+                <especificacion>Carga rápida: Sí (hasta 3A)</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>15</stock>
+            <marca>Genérica</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="2">
+            <nombre>Cable Lightning a USB (original)</nombre>
+            <categoria>cables</categoria>
+            <precio>12500</precio>
+            <descripcion>Certificado MFI, carga estable para iPhone. Compatible con todos los dispositivos Lightning.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/41DYGEgq3FL._SL1132_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Longitud: 1 metro</especificacion>
+                <especificacion>Certificación: MFI (Made for iPhone)</especificacion>
+                <especificacion>Carga rápida: Sí</especificacion>
+            </especificaciones>
+            <envio_gratis>false</envio_gratis>
+            <stock>8</stock>
+            <marca>Apple Certified</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="3">
+            <nombre>Cable HDMI 2.0 1.5m</nombre>
+            <categoria>cables</categoria>
+            <precio>15000</precio>
+            <descripcion>4K Ultra HD, dorado. Soporta HDR y audio digital de alta definición.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/71d6PM54SkL._SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Longitud: 1.5 metros</especificacion>
+                <especificacion>Resolución: 4K a 60Hz</especificacion>
+                <especificacion>Ancho de banda: 18Gbps</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>12</stock>
+            <marca>Premium</marca>
+            <destacado>false</destacado>
+        </producto>
+
+        <producto id="4">
+            <nombre>Cable Ethernet CAT6 3m</nombre>
+            <categoria>cables</categoria>
+            <precio>7200</precio>
+            <descripcion>Alta velocidad, conexión estable para gaming y streaming. Cable de red blindado.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/618lvVUIYrL._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Longitud: 3 metros</especificacion>
+                <especificacion>Categoría: CAT6</especificacion>
+                <especificacion>Velocidad: hasta 1Gbps</especificacion>
+            </especificaciones>
+            <envio_gratis>false</envio_gratis>
+            <stock>20</stock>
+            <marca>Network Pro</marca>
+            <destacado>false</destacado>
+        </producto>
+
+        <!-- CARGADORES -->
+        <producto id="5">
+            <nombre>Cargador rápido 20W USB-C</nombre>
+            <categoria>cargadores</categoria>
+            <precio>18500</precio>
+            <descripcion>Carga rápida para Samsung, iPhone, etc. Compatible con Power Delivery 3.0.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/41cyDnFba7L._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Potencia: 20W</especificacion>
+                <especificacion>Puertos: 1x USB-C</especificacion>
+                <especificacion>Tecnología: Power Delivery</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>25</stock>
+            <marca>FastCharge</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="6">
+            <nombre>Cargador inalámbrico 15W</nombre>
+            <categoria>cargadores</categoria>
+            <precio>22500</precio>
+            <descripcion>Base carga rápida, con ventilador para evitar sobrecalentamiento. Compatible con Qi.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/71DH+e+wsVL._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Potencia: 15W</especificacion>
+                <especificacion>Tecnología: Carga inalámbrica Qi</especificacion>
+                <especificacion>Ventilador: Sí, silencioso</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>10</stock>
+            <marca>AirCharge</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="7">
+            <nombre>Adaptador auto 36W (2 puertos)</nombre>
+            <categoria>cargadores</categoria>
+            <precio>13400</precio>
+            <descripcion>Carga dual para coche. Dos puertos USB para cargar dos dispositivos simultáneamente.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/51i+90EVDjL._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Potencia total: 36W</especificacion>
+                <especificacion>Puertos: 2x USB</especificacion>
+                <especificacion>Entrada: 12-24V</especificacion>
+            </especificaciones>
+            <envio_gratis>false</envio_gratis>
+            <stock>18</stock>
+            <marca>RoadCharge</marca>
+            <destacado>false</destacado>
+        </producto>
+
+        <!-- AUDÍFONOS -->
+        <producto id="8">
+            <nombre>Audífonos Bluetooth TWS</nombre>
+            <categoria>audifonos</categoria>
+            <precio>32900</precio>
+            <descripcion>Cancelación de ruido, estuche carga. Batería de 24 horas con estuche.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/516gXzENw1L._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Tipo: True Wireless</especificacion>
+                <especificacion>Cancelación de ruido: Sí (ANC)</especificacion>
+                <especificacion>Batería: 6h + 18h estuche</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>7</stock>
+            <marca>SoundPro</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="9">
+            <nombre>Audífonos diadema inalámbricos</nombre>
+            <categoria>audifonos</categoria>
+            <precio>45500</precio>
+            <descripcion>Sonido envolvente, 20h batería. Cómodos para uso prolongado.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/61X-3uhHV-L._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Tipo: Over-ear</especificacion>
+                <especificacion>Batería: 20 horas</especificacion>
+                <especificacion>Conexión: Bluetooth 5.0</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>5</stock>
+            <marca>AudioMax</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="10">
+            <nombre>Audífonos deportivos Bluetooth</nombre>
+            <categoria>audifonos</categoria>
+            <precio>27500</precio>
+            <descripcion>Resistentes al sudor, ajuste seguro para correr y hacer ejercicio.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/51vqMmvB4-L._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Resistencia: IPX5 (sudor)</especificacion>
+                <especificacion>Batería: 8 horas</especificacion>
+                <especificacion>Ganchos: Ajuste seguro</especificacion>
+            </especificaciones>
+            <envio_gratis>false</envio_gratis>
+            <stock>12</stock>
+            <marca>SportBeats</marca>
+            <destacado>false</destacado>
+        </producto>
+
+        <!-- BOCINAS -->
+        <producto id="11">
+            <nombre>Bocina portátil BT 10W</nombre>
+            <categoria>bocinas</categoria>
+            <precio>39900</precio>
+            <descripcion>Sumergible, batería 12h. Resistente al agua IPX7.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/71Zlj-CiTwL._AC_SL1200_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Potencia: 10W</especificacion>
+                <especificacion>Resistencia: IPX7 (sumergible)</especificacion>
+                <especificacion>Batería: 12 horas</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>9</stock>
+            <marca>AquaSound</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="12">
+            <nombre>Parlante fiesta 30W con luces</nombre>
+            <categoria>bocinas</categoria>
+            <precio>68900</precio>
+            <descripcion>Bluetooth, USB, FM. Luces RGB sincronizadas con la música.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/71OnNcoCzGL._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Potencia: 30W RMS</especificacion>
+                <especificacion>Luces: RGB programables</especificacion>
+                <especificacion>Entradas: Bluetooth, USB, AUX, MicroSD</especificacion>
+            </especificaciones>
+            <envio_gratis>true</envio_gratis>
+            <stock>4</stock>
+            <marca>PartyMaster</marca>
+            <destacado>true</destacado>
+        </producto>
+
+        <producto id="13">
+            <nombre>Mini bocina con cuerda</nombre>
+            <categoria>bocinas</categoria>
+            <precio>19900</precio>
+            <descripcion>Lígera, ideal para exteriores. Se cuelga fácilmente.</descripcion>
+            <imagenes>
+                <imagen>https://m.media-amazon.com/images/I/71lDHKcncUL._AC_SL1500_.jpg</imagen>
+            </imagenes>
+            <especificaciones>
+                <especificacion>Potencia: 5W</especificacion>
+                <especificacion>Batería: 6 horas</especificacion>
+                <especificacion>Cuerda: Incluida para colgar</especificacion>
+            </especificaciones>
+            <envio_gratis>false</envio_gratis>
+            <stock>15</stock>
+            <marca>TravelSound</marca>
+            <destacado>false</destacado>
+        </producto>
+    </productos>
+
+    <!-- ============================================
+         CONFIGURACIÓN DE LA PÁGINA
+         ============================================ -->
+    <pagina>
+        <productos_por_pagina>12</productos_por_pagina>
+        <productos_destacados_por_categoria>4</productos_destacados_por_categoria>
+        <moneda>$</moneda>
+        <formato_precio>CLP</formato_precio>
+        <impuesto_incluido>true</impuesto_incluido>
+        <porcentaje_impuesto>19</porcentaje_impuesto>
+    </pagina>
+
+    <!-- ============================================
+         MENSAJES DEL SITIO
+         ============================================ -->
+    <mensajes>
+        <mensaje tipo="envio_gratis">🚚 Envío gratis a Campeche y Yucatán</mensaje>
+        <mensaje tipo="sin_stock">😞 Producto agotado</mensaje>
+        <mensaje tipo="compra_exitosa">✅ ¡Gracias por tu compra!</mensaje>
+        <mensaje tipo="bienvenida">Bienvenido a mayabtech.mx</mensaje>
+    </mensajes>
+</configuracion>

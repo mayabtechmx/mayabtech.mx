@@ -151,9 +151,8 @@ a {
 }
 .carousel-slide img {
     width: 100%;
-    height: auto;
-    max-height: 300px;
-    object-fit: cover;
+    height: 400px; /* Altura fija más grande */
+    object-fit: cover; /* Mantiene la proporción recortando si es necesario */
     display: block;
 }
 .slide-text {
