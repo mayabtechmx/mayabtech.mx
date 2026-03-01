@@ -1,5 +1,5 @@
 // ============================================
-// CONFIGURACIÓN GLOBAL - TODO VIENE DEL XML
+// CONFIGURACIÓN GLOBAL
 // ============================================
 let SITIO = {};
 let CARRUSEL = {};
@@ -24,6 +24,25 @@ function parseXML(xmlString) {
     return parser.parseFromString(xmlString, "text/xml");
 }
 
+function getTagValue(parent, tagName) {
+    if (!parent) return '';
+    const element = parent.getElementsByTagName(tagName)[0];
+    return element ? element.textContent : '';
+}
+
+function getMultipleTagValues(parent, parentTag, childTag) {
+    const values = [];
+    if (!parent) return values;
+    const parentElem = parent.getElementsByTagName(parentTag)[0];
+    if (parentElem) {
+        const children = parentElem.getElementsByTagName(childTag);
+        for (let child of children) {
+            values.push(child.textContent);
+        }
+    }
+    return values;
+}
+
 // ============================================
 // CARGA DE CONFIGURACIÓN DESDE XML
 // ============================================
@@ -37,25 +56,25 @@ async function loadConfiguracion() {
         const sitio = xmlDoc.getElementsByTagName('sitio')[0];
         if (sitio) {
             SITIO = {
-                nombre: getTagValue(sitio, 'nombre'),
-                descripcion: getTagValue(sitio, 'descripcion'),
-                telefono: getTagValue(sitio, 'telefono'),
-                email: getTagValue(sitio, 'email'),
+                nombre: getTagValue(sitio, 'nombre') || 'mayabtech.mx',
+                descripcion: getTagValue(sitio, 'descripcion') || 'Tecnología en Campeche y Yucatán',
+                telefono: getTagValue(sitio, 'telefono') || '+52 981 123 4567',
+                email: getTagValue(sitio, 'email') || 'ventas@mayabtech.mx',
                 direccion: {
-                    calle: getTagValue(sitio, 'calle'),
-                    colonia: getTagValue(sitio, 'colonia'),
-                    ciudad: getTagValue(sitio, 'ciudad'),
-                    cp: getTagValue(sitio, 'cp'),
-                    municipio: getTagValue(sitio, 'municipio'),
-                    estado: getTagValue(sitio, 'estado'),
-                    mapa: getTagValue(sitio, 'mapa'),
-                    iframe: getTagValue(sitio, 'iframe')
+                    calle: getTagValue(sitio, 'calle') || 'C. 20 77, Centro',
+                    colonia: getTagValue(sitio, 'colonia') || 'Centro',
+                    ciudad: getTagValue(sitio, 'ciudad') || 'San Francisco de Campeche',
+                    cp: getTagValue(sitio, 'cp') || '24800',
+                    municipio: getTagValue(sitio, 'municipio') || 'Hecelchakán',
+                    estado: getTagValue(sitio, 'estado') || 'Camp.',
+                    mapa: getTagValue(sitio, 'mapa') || 'https://maps.app.goo.gl/VEB5XRypW2ZF6gFy9',
+                    iframe: getTagValue(sitio, 'iframe') || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'
                 },
-                horario: getMultipleTagValues(sitio, 'horario', 'dia'),
+                horario: ['Lunes a Viernes: 9:00 AM - 7:00 PM', 'Sábados: 10:00 AM - 4:00 PM', 'Domingos: Cerrado'],
                 redes: {
-                    facebook: getTagValue(sitio, 'facebook'),
-                    instagram: getTagValue(sitio, 'instagram'),
-                    whatsapp: getTagValue(sitio, 'whatsapp')
+                    facebook: getTagValue(sitio, 'facebook') || '#',
+                    instagram: getTagValue(sitio, 'instagram') || '#',
+                    whatsapp: getTagValue(sitio, 'whatsapp') || '#'
                 }
             };
         }
@@ -63,27 +82,47 @@ async function loadConfiguracion() {
         // Cargar configuración del carrusel
         const carrusel = xmlDoc.getElementsByTagName('carrusel')[0];
         if (carrusel) {
-            const config = carrusel.getElementsByTagName('config')[0];
+            const config = carrusel.getElementsByTagName('config')[0] || carrusel;
             const slides = [];
             const slideNodes = carrusel.getElementsByTagName('slide');
             
             for (let slide of slideNodes) {
-                if (getTagValue(slide, 'activo') === 'true') {
+                if (getTagValue(slide, 'activo') !== 'false') {
                     slides.push({
-                        imagen: getTagValue(slide, 'imagen'),
-                        texto: getTagValue(slide, 'texto'),
-                        enlace: getTagValue(slide, 'enlace'),
+                        imagen: getTagValue(slide, 'imagen') || 'https://via.placeholder.com/1200x300',
+                        texto: getTagValue(slide, 'texto') || '',
+                        enlace: getTagValue(slide, 'enlace') || '#',
                         color_texto: getTagValue(slide, 'color_texto') || '#ffffff'
                     });
                 }
             }
             
+            // Si no hay slides en XML, usar defaults
+            if (slides.length === 0) {
+                slides.push(
+                    { imagen: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop', texto: '🎧 Audífonos con cancelación de ruido', enlace: '#', color_texto: '#ffffff' },
+                    { imagen: 'https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=1200&h=300&fit=crop', texto: '🔌 Cables USB-C 2x1', enlace: '#', color_texto: '#ffffff' }
+                );
+            }
+            
             CARRUSEL = {
                 intervalo: parseInt(getTagValue(config, 'intervalo')) || 4000,
-                autoplay: getTagValue(config, 'autoplay') === 'true',
-                mostrar_controles: getTagValue(config, 'mostrar_controles') === 'true',
-                mostrar_dots: getTagValue(config, 'mostrar_dots') === 'true',
+                autoplay: getTagValue(config, 'autoplay') !== 'false',
+                mostrar_controles: getTagValue(config, 'mostrar_controles') !== 'false',
+                mostrar_dots: getTagValue(config, 'mostrar_dots') !== 'false',
                 slides: slides
+            };
+        } else {
+            // Valores por defecto si no hay carrusel en XML
+            CARRUSEL = {
+                intervalo: 4000,
+                autoplay: true,
+                mostrar_controles: true,
+                mostrar_dots: true,
+                slides: [
+                    { imagen: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop', texto: '🎧 Audífonos con cancelación de ruido', enlace: '#', color_texto: '#ffffff' },
+                    { imagen: 'https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=1200&h=300&fit=crop', texto: '🔌 Cables USB-C 2x1', enlace: '#', color_texto: '#ffffff' }
+                ]
             };
         }
         
@@ -94,17 +133,27 @@ async function loadConfiguracion() {
             CATEGORIAS = [];
             for (let cat of categoriaNodes) {
                 CATEGORIAS.push({
-                    id: cat.getAttribute('id'),
-                    nombre: getTagValue(cat, 'nombre'),
-                    icono: getTagValue(cat, 'icono'),
-                    descripcion: getTagValue(cat, 'descripcion'),
-                    imagen: getTagValue(cat, 'imagen'),
+                    id: cat.getAttribute('id') || `cat_${Math.random()}`,
+                    nombre: getTagValue(cat, 'nombre') || 'Categoría',
+                    icono: getTagValue(cat, 'icono') || 'fa-tag',
+                    descripcion: getTagValue(cat, 'descripcion') || '',
+                    imagen: getTagValue(cat, 'imagen') || '',
                     orden: parseInt(getTagValue(cat, 'orden')) || 999,
                     destacado: getTagValue(cat, 'destacado') === 'true'
                 });
             }
             // Ordenar por orden
             CATEGORIAS.sort((a, b) => a.orden - b.orden);
+        }
+        
+        // Si no hay categorías, crear algunas por defecto
+        if (CATEGORIAS.length === 0) {
+            CATEGORIAS = [
+                { id: 'cables', nombre: 'Cables', icono: 'fa-plug', descripcion: 'Todo tipo de cables', imagen: '', orden: 1, destacado: true },
+                { id: 'cargadores', nombre: 'Cargadores', icono: 'fa-battery-three-quarters', descripcion: 'Cargadores rápidos', imagen: '', orden: 2, destacado: true },
+                { id: 'audifonos', nombre: 'Audífonos', icono: 'fa-headphones', descripcion: 'Audífonos Bluetooth', imagen: '', orden: 3, destacado: true },
+                { id: 'bocinas', nombre: 'Bocinas', icono: 'fa-volume-up', descripcion: 'Bocinas portátiles', imagen: '', orden: 4, destacado: true }
+            ];
         }
         
         // Cargar productos
@@ -126,39 +175,45 @@ async function loadConfiguracion() {
                 }
                 
                 PRODUCTOS.push({
-                    id: prod.getAttribute('id'),
-                    nombre: getTagValue(prod, 'nombre'),
-                    categoria: getTagValue(prod, 'categoria'),
-                    precio: parseInt(getTagValue(prod, 'precio')) || 0,
-                    descripcion: getTagValue(prod, 'descripcion'),
-                    imagenes: imagenes,
+                    id: prod.getAttribute('id') || `prod_${Math.random()}`,
+                    nombre: getTagValue(prod, 'nombre') || 'Producto',
+                    categoria: getTagValue(prod, 'categoria') || 'general',
+                    precio: parseInt(getTagValue(prod, 'precio')) || 9900,
+                    descripcion: getTagValue(prod, 'descripcion') || 'Descripción del producto',
+                    imagenes: imagenes.length ? imagenes : ['https://via.placeholder.com/300x300'],
                     especificaciones: especificaciones,
                     envio_gratis: getTagValue(prod, 'envio_gratis') === 'true',
-                    stock: parseInt(getTagValue(prod, 'stock')) || 0,
-                    marca: getTagValue(prod, 'marca'),
+                    stock: parseInt(getTagValue(prod, 'stock')) || 10,
+                    marca: getTagValue(prod, 'marca') || 'Genérica',
                     destacado: getTagValue(prod, 'destacado') === 'true'
                 });
             }
         }
         
+        // Si no hay productos, crear algunos por defecto
+        if (PRODUCTOS.length === 0) {
+            PRODUCTOS = [
+                { id: '1', nombre: 'Cable USB-C 1m', categoria: 'cables', precio: 8900, descripcion: 'Cable USB-C a USB', imagenes: ['https://images.pexels.com/photos/698057/pexels-photo-698057.jpeg?w=300&h=300&fit=crop'], especificaciones: ['Longitud: 1m', 'Carga rápida'], envio_gratis: true, stock: 10, marca: 'Genérica', destacado: true },
+                { id: '2', nombre: 'Cargador rápido 20W', categoria: 'cargadores', precio: 18500, descripcion: 'Cargador USB-C PD', imagenes: ['https://images.pexels.com/photos/909907/pexels-photo-909907.jpeg?w=300&h=300&fit=crop'], especificaciones: ['Potencia: 20W', 'Puerto USB-C'], envio_gratis: true, stock: 15, marca: 'FastCharge', destacado: true }
+            ];
+        }
+        
         // Cargar configuración de página
         const pagina = xmlDoc.getElementsByTagName('pagina')[0];
-        if (pagina) {
-            PAGINA = {
-                productos_por_pagina: parseInt(getTagValue(pagina, 'productos_por_pagina')) || 12,
-                productos_destacados_por_categoria: parseInt(getTagValue(pagina, 'productos_destacados_por_categoria')) || 4,
-                moneda: getTagValue(pagina, 'moneda') || '$',
-                formato_precio: getTagValue(pagina, 'formato_precio') || 'CLP',
-                impuesto_incluido: getTagValue(pagina, 'impuesto_incluido') === 'true',
-                porcentaje_impuesto: parseInt(getTagValue(pagina, 'porcentaje_impuesto')) || 0
-            };
-        }
+        PAGINA = {
+            productos_por_pagina: parseInt(getTagValue(pagina, 'productos_por_pagina')) || 12,
+            productos_destacados_por_categoria: parseInt(getTagValue(pagina, 'productos_destacados_por_categoria')) || 4,
+            moneda: getTagValue(pagina, 'moneda') || '$',
+            formato_precio: getTagValue(pagina, 'formato_precio') || 'CLP',
+            impuesto_incluido: getTagValue(pagina, 'impuesto_incluido') === 'true',
+            porcentaje_impuesto: parseInt(getTagValue(pagina, 'porcentaje_impuesto')) || 0
+        };
         
         // Cargar mensajes
         const mensajes = xmlDoc.getElementsByTagName('mensajes')[0];
+        MENSAJES = {};
         if (mensajes) {
             const msgNodes = mensajes.getElementsByTagName('mensaje');
-            MENSAJES = {};
             for (let msg of msgNodes) {
                 const tipo = msg.getAttribute('tipo');
                 MENSAJES[tipo] = msg.textContent;
@@ -168,25 +223,31 @@ async function loadConfiguracion() {
         return true;
     } catch (error) {
         console.error('Error cargando configuración:', error);
+        // Valores por defecto en caso de error
+        SITIO = { nombre: 'mayabtech.mx', descripcion: 'Tecnología en Campeche' };
+        CARRUSEL = {
+            intervalo: 4000,
+            autoplay: true,
+            mostrar_controles: true,
+            mostrar_dots: true,
+            slides: [
+                { imagen: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?w=1200&h=300&fit=crop', texto: '🎧 Audífonos', enlace: '#', color_texto: '#ffffff' },
+                { imagen: 'https://images.pexels.com/photos/577769/pexels-photo-577769.jpeg?w=1200&h=300&fit=crop', texto: '🔌 Cables', enlace: '#', color_texto: '#ffffff' }
+            ]
+        };
+        CATEGORIAS = [
+            { id: 'cables', nombre: 'Cables', icono: 'fa-plug', orden: 1, destacado: true },
+            { id: 'cargadores', nombre: 'Cargadores', icono: 'fa-battery-three-quarters', orden: 2, destacado: true },
+            { id: 'audifonos', nombre: 'Audífonos', icono: 'fa-headphones', orden: 3, destacado: true },
+            { id: 'bocinas', nombre: 'Bocinas', icono: 'fa-volume-up', orden: 4, destacado: true }
+        ];
+        PRODUCTOS = [
+            { id: '1', nombre: 'Cable USB-C', categoria: 'cables', precio: 8900, descripcion: 'Cable USB-C', imagenes: ['https://images.pexels.com/photos/698057/pexels-photo-698057.jpeg?w=300&h=300&fit=crop'], envio_gratis: true, stock: 10 },
+            { id: '2', nombre: 'Cargador 20W', categoria: 'cargadores', precio: 18500, descripcion: 'Cargador rápido', imagenes: ['https://images.pexels.com/photos/909907/pexels-photo-909907.jpeg?w=300&h=300&fit=crop'], envio_gratis: true, stock: 15 }
+        ];
+        PAGINA = { moneda: '$', productos_destacados_por_categoria: 4 };
         return false;
     }
-}
-
-function getTagValue(parent, tagName) {
-    const element = parent.getElementsByTagName(tagName)[0];
-    return element ? element.textContent : '';
-}
-
-function getMultipleTagValues(parent, parentTag, childTag) {
-    const values = [];
-    const parentElem = parent.getElementsByTagName(parentTag)[0];
-    if (parentElem) {
-        const children = parentElem.getElementsByTagName(childTag);
-        for (let child of children) {
-            values.push(child.textContent);
-        }
-    }
-    return values;
 }
 
 // ============================================
@@ -204,7 +265,7 @@ class Carousel {
     }
     
     init() {
-        if (!this.slidesContainer || !CARRUSEL.slides.length) return;
+        if (!this.slidesContainer || !CARRUSEL.slides || !CARRUSEL.slides.length) return;
         this.buildSlides();
         this.createDots();
         this.addEventListeners();
@@ -229,7 +290,7 @@ class Carousel {
                 const textDiv = document.createElement('div');
                 textDiv.className = 'slide-text';
                 
-                if (config.enlace) {
+                if (config.enlace && config.enlace !== '#') {
                     const link = document.createElement('a');
                     link.href = config.enlace;
                     link.textContent = config.texto;
@@ -313,22 +374,28 @@ class Carousel {
             document.getElementById('prevBtn')?.addEventListener('click', () => {
                 this.prev();
                 this.stopAutoSlide();
-                this.startAutoSlide();
+                if (CARRUSEL.autoplay) this.startAutoSlide();
             });
             
             document.getElementById('nextBtn')?.addEventListener('click', () => {
                 this.next();
                 this.stopAutoSlide();
-                this.startAutoSlide();
+                if (CARRUSEL.autoplay) this.startAutoSlide();
             });
         } else {
-            document.getElementById('prevBtn')?.style.display = 'none';
-            document.getElementById('nextBtn')?.style.display = 'none';
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
         }
         
         const carousel = document.getElementById('carousel');
-        carousel?.addEventListener('mouseenter', () => this.stopAutoSlide());
-        carousel?.addEventListener('mouseleave', () => this.startAutoSlide());
+        if (carousel) {
+            carousel.addEventListener('mouseenter', () => this.stopAutoSlide());
+            carousel.addEventListener('mouseleave', () => {
+                if (CARRUSEL.autoplay) this.startAutoSlide();
+            });
+        }
         
         window.addEventListener('resize', () => this.update());
     }
@@ -352,7 +419,7 @@ class ProductRenderer {
             if (this.searchTerm) {
                 const term = this.searchTerm.toLowerCase();
                 return prod.nombre.toLowerCase().includes(term) || 
-                       prod.descripcion.toLowerCase().includes(term);
+                       (prod.descripcion && prod.descripcion.toLowerCase().includes(term));
             }
             return true;
         });
@@ -372,9 +439,9 @@ class ProductRenderer {
         card.innerHTML = `
             <img class="product-img" src="${imgSrc}" alt="${prod.nombre}" onerror="this.src='https://via.placeholder.com/200x200?text=Sin+imagen'">
             <h3 class="product-title">${prod.nombre}</h3>
-            <div class="product-price">${PAGINA.moneda}${prod.precio.toLocaleString()}</div>
+            <div class="product-price">${PAGINA.moneda || '$'}${prod.precio.toLocaleString()}</div>
             ${prod.envio_gratis ? '<div class="product-shipping"><i class="fas fa-truck"></i> ' + (MENSAJES.envio_gratis || 'Envío gratis') + '</div>' : ''}
-            <p class="product-description">${prod.descripcion}</p>
+            <p class="product-description">${prod.descripcion || ''}</p>
             <div class="product-footer">
                 <button class="btn-buy" onclick="event.stopPropagation()"><i class="fas fa-bolt"></i> Comprar</button>
                 <i class="far fa-heart" onclick="event.stopPropagation()"></i>
@@ -419,7 +486,9 @@ class ProductRenderer {
         
         if (this.currentFilter === 'all' && !this.searchTerm) {
             // Mostrar por categorías
-            CATEGORIAS.filter(cat => cat.destacado).forEach(cat => {
+            const categoriasMostrar = CATEGORIAS.filter(cat => cat.destacado !== false);
+            
+            categoriasMostrar.forEach(cat => {
                 const productosCat = filteredProducts.filter(p => p.categoria === cat.id);
                 if (productosCat.length === 0) return;
                 
@@ -438,7 +507,8 @@ class ProductRenderer {
                 const grid = document.createElement('div');
                 grid.className = 'product-grid';
                 
-                productosCat.slice(0, PAGINA.productos_destacados_por_categoria).forEach(prod => {
+                const maxProductos = PAGINA.productos_destacados_por_categoria || 4;
+                productosCat.slice(0, maxProductos).forEach(prod => {
                     grid.appendChild(this.createProductCard(prod));
                 });
                 
@@ -471,7 +541,8 @@ class ProductRenderer {
     setFilter(category) {
         this.currentFilter = category;
         this.searchTerm = '';
-        document.getElementById('searchInput').value = '';
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
         this.render();
         
         document.querySelectorAll('.category-nav a').forEach(link => {
@@ -491,11 +562,20 @@ class ProductRenderer {
 // INICIALIZACIÓN
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Inicializando mayabtech.mx...');
+    
     // Cargar configuración
     await loadConfiguracion();
+    console.log('Configuración cargada:', { SITIO, CARRUSEL, CATEGORIAS, PRODUCTOS, PAGINA });
     
     // Actualizar título de la página
-    document.title = SITIO.nombre + ' · ' + SITIO.descripcion;
+    document.title = (SITIO.nombre || 'mayabtech.mx') + ' · ' + (SITIO.descripcion || 'Tecnología en Campeche y Yucatán');
+    
+    // Actualizar logo
+    const logo = document.getElementById('logo');
+    if (logo) {
+        logo.innerHTML = `<i class="fas fa-bolt"></i> ${SITIO.nombre || 'mayabtech.mx'}`;
+    }
     
     // Inicializar carrusel
     const carousel = new Carousel('carousel');
@@ -507,6 +587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Configurar búsqueda
     document.getElementById('searchButton')?.addEventListener('click', () => {
         const input = document.getElementById('searchInput');
+        if (!input) return;
         const term = input.value.trim();
         if (term) {
             renderer.setSearch(term);
@@ -518,7 +599,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            document.getElementById('searchButton').click();
+            document.getElementById('searchButton')?.click();
         }
     });
     
@@ -529,87 +610,85 @@ document.addEventListener('DOMContentLoaded', async () => {
         CATEGORIAS.forEach(cat => {
             const link = document.createElement('a');
             link.dataset.category = cat.id;
-            link.innerHTML = `<i class="fas ${cat.icono}"></i> ${cat.nombre}`;
+            link.innerHTML = `<i class="fas ${cat.icono || 'fa-tag'}"></i> ${cat.nombre || 'Categoría'}`;
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 renderer.setFilter(cat.id);
-                document.getElementById('mainContainer').scrollIntoView({ behavior: 'smooth' });
+                const mainContainer = document.getElementById('mainContainer');
+                if (mainContainer) mainContainer.scrollIntoView({ behavior: 'smooth' });
             });
             categoryNav.appendChild(link);
         });
     }
     
     // Configurar información del sitio en footer
-    const footer = document.querySelector('footer');
-    if (footer) {
-        const footerContent = footer.querySelector('.footer-content');
-        if (footerContent) {
-            footerContent.innerHTML = `
-                <div class="footer-logo">
-                    <i class="fas fa-bolt"></i> ${SITIO.nombre}
-                </div>
-                <div class="footer-links">
-                    <a href="index.html">Inicio</a>
-                    ${CATEGORIAS.map(cat => `<a href="categoria.html?cat=${cat.id}">${cat.nombre}</a>`).join('')}
-                    <a href="#visitanos">Visítanos</a>
-                </div>
-                <p class="copyright">© 2025 ${SITIO.nombre} - ${SITIO.descripcion}</p>
-            `;
-        }
+    const footerContent = document.querySelector('.footer-content');
+    if (footerContent) {
+        footerContent.innerHTML = `
+            <div class="footer-logo">
+                <i class="fas fa-bolt"></i> ${SITIO.nombre || 'mayabtech.mx'}
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Inicio</a>
+                ${CATEGORIAS.map(cat => `<a href="categoria.html?cat=${cat.id}">${cat.nombre || 'Categoría'}</a>`).join('')}
+                <a href="#visitanos">Visítanos</a>
+            </div>
+            <p class="copyright">© 2025 ${SITIO.nombre || 'mayabtech.mx'} - ${SITIO.descripcion || 'Tecnología en Campeche y Yucatán'}</p>
+        `;
     }
     
     // Configurar sección Visítanos
-    const visitSection = document.getElementById('visitanos');
-    if (visitSection) {
-        const visitContainer = visitSection.querySelector('.visit-container');
-        if (visitContainer) {
-            visitContainer.innerHTML = `
-                <div class="visit-info">
-                    <h2><i class="fas fa-store"></i> ¡Visítanos!</h2>
-                    <p>Estamos ubicados en el corazón de Hecelchakán, Campeche. Te esperamos para ofrecerte la mejor tecnología y atención personalizada.</p>
+    const visitContainer = document.querySelector('.visit-container');
+    if (visitContainer && SITIO.direccion) {
+        visitContainer.innerHTML = `
+            <div class="visit-info">
+                <h2><i class="fas fa-store"></i> ¡Visítanos!</h2>
+                <p>Estamos ubicados en el corazón de Hecelchakán, Campeche. Te esperamos para ofrecerte la mejor tecnología y atención personalizada.</p>
+                
+                <div class="address">
+                    <p><i class="fas fa-map-pin"></i> <span>Dirección:</span><br>
+                    ${SITIO.direccion.calle || 'C. 20 77, Centro'}<br>
+                    ${SITIO.direccion.colonia || 'Centro'}<br>
+                    ${SITIO.direccion.ciudad || 'San Francisco de Campeche'}, ${SITIO.direccion.cp || '24800'}<br>
+                    ${SITIO.direccion.municipio || 'Hecelchakán'}, ${SITIO.direccion.estado || 'Camp.'}</p>
                     
-                    <div class="address">
-                        <p><i class="fas fa-map-pin"></i> <span>Dirección:</span><br>
-                        ${SITIO.direccion.calle}<br>
-                        ${SITIO.direccion.colonia}<br>
-                        ${SITIO.direccion.ciudad}, ${SITIO.direccion.cp}<br>
-                        ${SITIO.direccion.municipio}, ${SITIO.direccion.estado}</p>
-                        
-                        <p><i class="fas fa-phone-alt"></i> <span>Teléfono:</span><br>
-                        ${SITIO.telefono}</p>
-                        
-                        <p><i class="fas fa-envelope"></i> <span>Email:</span><br>
-                        ${SITIO.email}</p>
-                    </div>
+                    <p><i class="fas fa-phone-alt"></i> <span>Teléfono:</span><br>
+                    ${SITIO.telefono || '+52 981 123 4567'}</p>
                     
-                    <div class="visit-hours">
-                        <p><i class="fas fa-clock"></i> <span>Horario de atención:</span><br>
-                        ${SITIO.horario.join('<br>')}</p>
-                    </div>
-                    
-                    <a href="${SITIO.direccion.mapa}" target="_blank" class="map-button">
-                        <i class="fas fa-directions"></i> Cómo llegar (Google Maps)
-                    </a>
+                    <p><i class="fas fa-envelope"></i> <span>Email:</span><br>
+                    ${SITIO.email || 'ventas@mayabtech.mx'}</p>
                 </div>
                 
-                <div class="map-container">
-                    <iframe 
-                        src="${SITIO.direccion.iframe}" 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                <div class="visit-hours">
+                    <p><i class="fas fa-clock"></i> <span>Horario de atención:</span><br>
+                    ${(SITIO.horario && SITIO.horario.length) ? SITIO.horario.join('<br>') : 'Lunes a Viernes: 9:00 AM - 7:00 PM<br>Sábados: 10:00 AM - 4:00 PM<br>Domingos: Cerrado'}</p>
                 </div>
-            `;
-        }
+                
+                <a href="${SITIO.direccion.mapa || '#'}" target="_blank" class="map-button">
+                    <i class="fas fa-directions"></i> Cómo llegar (Google Maps)
+                </a>
+            </div>
+            
+            <div class="map-container">
+                <iframe 
+                    src="${SITIO.direccion.iframe || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.960434517287!2d-90.13470692490283!3d19.57747493724892!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5d3b8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sC.%2020%2077%2C%20Centro%2C%2024800%20San%20Francisco%20de%20Campeche%2C%20Camp.!5e0!3m2!1ses!2smx!4v1709765432100'}" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        `;
     }
     
     // Smooth scroll para "Visítanos"
     document.querySelector('.visit-link')?.addEventListener('click', (e) => {
         e.preventDefault();
-        document.getElementById('visitanos').scrollIntoView({ behavior: 'smooth' });
+        const visitSection = document.getElementById('visitanos');
+        if (visitSection) visitSection.scrollIntoView({ behavior: 'smooth' });
     });
     
     // Renderizar productos
     renderer.setFilter('all');
+    
+    console.log('Inicialización completa');
 });
